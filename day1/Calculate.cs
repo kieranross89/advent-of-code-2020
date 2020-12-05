@@ -8,6 +8,7 @@ namespace day1
     {
         public static int Part1Answer(IEnumerable<int> numbers, int target)
         {
+            int result = 0;
             var lookup = new HashSet<int>();
 
             foreach (var number in numbers)
@@ -23,7 +24,7 @@ namespace day1
                 }
             }
 
-            return 0;
+            return result > 0 ? result : throw new Exception("No matches found in input numbers");
         }
 
         public static int Part2Answer(IEnumerable<int> numbers, int target)
