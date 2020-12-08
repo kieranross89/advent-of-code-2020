@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.IO;
+using System.Text;
 
 namespace day2
 {
@@ -11,53 +13,34 @@ namespace day2
         static void Main(string[] args)
         {
             var lines = ReadInputFromFile(args[0]).ToList();
-            // var lines 
-            var passwordValidity = new List<bool>();
+            var passwordPolicies = ParseInputPasswordPolicies(lines);
 
-            foreach (var line in lines)
-            {
-                var indexOfFirstColon = line.IndexOf(":");
+            // Part 1
+            var result1 = passwordPolicies.Select(x => x.GetPart1Answer());
+            Console.WriteLine($"Part 1: {result1.Count()} passwords input: {result1.Where(x => x == true).Count()} passwords are valid. {result1.Where(x => x == false).Count()} passwords are invalid.");
 
-                var r = new Regex(@"(\d+)-(\d+)");
-                var policyRangeMatches = r.Match(line);
+            // Part 2
+            var result2 = passwordPolicies.Select(x => x.GetPart2Answer());
+            Console.WriteLine($"Part 2: {result2.Count()} passwords input: {result2.Where(x => x == true).Count()} passwords are valid. {result2.Where(x => x == false).Count()} passwords are invalid.");
+        }
 
-                var policyMin = Int32.Parse(policyRangeMatches.Groups[1].ToString());
-                var policyMax = Int32.Parse(policyRangeMatches.Groups[2].ToString());
-                
-                var charForPolicy = line.Substring(indexOfFirstColon - 1, 1);
-                var password = line.Substring(indexOfFirstColon + 1).Trim();
-
-                var count = password.Split(charForPolicy).Length - 1;
-
-                if (count >= policyMin && count <= policyMax)
-                {
-                    Console.WriteLine(true);
-                    passwordValidity.Add(true);
-                }
-                else
-                {
-                    Console.WriteLine(false);
-                    passwordValidity.Add(false);
-                }
-            }
-
-            Console.WriteLine($"{passwordValidity.Count} passwords input: {passwordValidity.Where(x => x == true).Count()} passwords are valid. {passwordValidity.Where(x => x == false).Count()} passwords are invalid.");
+        private static IEnumerable<PasswordPolicy> ParseInputPasswordPolicies(IEnumerable<string> lines)
+        {
+            var regex = new Regex(@"(\d+)-(\d+) (\w): (\w+)");
+            return lines.Select(l => {
+                var matches = regex.Match(l);
+                return new PasswordPolicy(
+                    min: Int32.Parse(matches.Groups[1].ToString()),
+                    max: Int32.Parse(matches.Groups[2].ToString()),
+                    requiredCharacter: matches.Groups[3].ToString(),
+                    password: matches.Groups[4].ToString()
+                );
+            });
         }
 
         internal static IEnumerable<string> ReadInputFromFile(string filename)
         {
-            string line;
-            var input = new List<string>();
-
-            System.IO.StreamReader file = new System.IO.StreamReader(filename);
-            while ((line = file.ReadLine()) != null)
-            {
-                input.Add(line);
-            }
-
-            file.Close();
-
-            return input;
+            return File.ReadAllLines(filename);
         }
     }
 }
