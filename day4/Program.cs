@@ -10,7 +10,6 @@ namespace day4
         
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
             var inputs = ParseInput(args[0]);
 
             var result1 = new List<bool>();
